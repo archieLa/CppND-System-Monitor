@@ -8,7 +8,6 @@ string ProcessParser::getCmd(const string& pid)
     try
     {
         Util::getStream(temp_path, stream);
-        string cmd;
         getline(stream, cmd);
     }
     catch(const std::exception& e)
