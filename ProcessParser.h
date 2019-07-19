@@ -1,3 +1,6 @@
+#ifndef PROC_PARSER_H
+#define PROC_PARSER_H
+
 #include <algorithm>
 #include <iostream>
 #include <math.h>
@@ -17,15 +20,15 @@
 #include <time.h>
 #include <unistd.h>
 #include "constants.h"
-
+#include "util.h"
 
 using namespace std;
 
 class ProcessParser{
 private:
-    std::ifstream stream;
+    std::ifstream stream_;
     public:
-    static string getCmd(string pid);
+    static string getCmd(const string& pid);
     static vector<string> getPidList();
     static std::string getVmSize(string pid);
     static std::string getCpuPercent(string pid);
@@ -44,4 +47,4 @@ private:
     static bool isPidExisting(string pid);
 };
 
-// TODO: Define all of the above functions below:
+#endif
