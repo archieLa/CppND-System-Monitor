@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <time.h>
 #include <unistd.h>
+#include <regex>
 #include "constants.h"
 #include "util.h"
 
@@ -30,10 +31,10 @@ private:
     public:
     static string getCmd(const string& pid);
     static vector<string> getPidList();
-    static std::string getVmSize(string pid);
-    static std::string getCpuPercent(string pid);
+    static string getVmSize(string pid);
+    static string getCpuPercent(string pid);
     static long int getSysUpTime();
-    static std::string getProcUpTime(string pid);
+    static string getProcUpTime(string pid);
     static string getProcUser(string pid);
     static vector<string> getSysCpuPercent(string coreNumber = "");
     static float getSysRamPercent();
@@ -44,7 +45,7 @@ private:
     static int getNumberOfRunningProcesses();
     static string getOSName();
     static std::string PrintCpuStats(std::vector<std::string> values1, std::vector<std::string>values2);
-    static bool isPidExisting(string pid);
+    static bool isPidExisting(const string& pid);
 };
 
 #endif
