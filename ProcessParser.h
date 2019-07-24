@@ -31,12 +31,12 @@ private:
     public:
     static string getCmd(const string& pid);
     static vector<string> getPidList();
-    static string getVmSize(string pid);
+    static string getVmSize(const string& pid);
     static string getCpuPercent(string pid);
     static long int getSysUpTime();
-    static string getProcUpTime(string pid);
-    static string getProcUser(string pid);
-    static vector<string> getSysCpuPercent(string coreNumber = "");
+    static string getProcUpTime(const string& pid);
+    static string getProcUser(const string& pid);
+    static vector<string> getSysCpuPercent(const string& coreNumber = "");
     static float getSysRamPercent();
     static string getSysKernelVersion();
     static int getNumberOfCores();

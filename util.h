@@ -49,6 +49,13 @@ static std::string getProgressBar(std::string percent)
 // wrapper for creating streams
 static void getStream(const std::string& path, std::ifstream& stream)
 {
+    // if stream is currently openeed close it before
+    // attempting to open a new one
+    if (stream.is_open())
+    {
+        stream.close();
+    }
+    
     stream.open (path, std::ifstream::in);
     if (!stream && !stream.is_open())
     {

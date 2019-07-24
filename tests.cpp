@@ -6,7 +6,7 @@
 int main(int argc, char *argv[] )
 {
     
-    std::cout << ProcessParser::getCmd("10") << "\n";
+    
     
     std::vector<std::string> pids = ProcessParser::getPidList();
     assert(pids.size() != 0);
@@ -15,9 +15,11 @@ int main(int argc, char *argv[] )
         std::cout << pid << "\n";
     }
 
-    assert(ProcessParser::isPidExisting("10") == true);
+    std::cout << ProcessParser::getCmd(pids[3]) << "\n";
 
-    
+
+
+    assert(ProcessParser::isPidExisting(pids[3]) == true);
     
     std::cout << ProcessParser::getSysUpTime() << "\n";
 
@@ -44,5 +46,11 @@ int main(int argc, char *argv[] )
     cout << ProcessParser::getSysKernelVersion() << "\n";
     cout <<ProcessParser::getOSName() << "\n";
     cout << ProcessParser::getNumberOfCores() << "\n";
+    cout << ProcessParser::getProcUpTime(pids[3]) << "\n";
+    cout << ProcessParser::getProcUser(pids[3]) << "\n";
+    cout << ProcessParser::getVmSize(pids[3]) << "\n";
+    cout << ProcessParser::getTotalThreads() << "\n";
+    cout << ProcessParser::getTotalNumberOfProcesses() << "\n";
+    cout << ProcessParser::getNumberOfRunningProcesses() << "\n";
 
 }
