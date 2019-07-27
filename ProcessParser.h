@@ -32,7 +32,7 @@ private:
     static string getCmd(const string& pid);
     static vector<string> getPidList();
     static string getVmSize(const string& pid);
-    static string getCpuPercent(string pid);
+    static string getCpuPercent(const string& pid);
     static long int getSysUpTime();
     static string getProcUpTime(const string& pid);
     static string getProcUser(const string& pid);
@@ -44,7 +44,7 @@ private:
     static int getTotalNumberOfProcesses();
     static int getNumberOfRunningProcesses();
     static string getOSName();
-    static std::string PrintCpuStats(std::vector<std::string> values1, std::vector<std::string>values2);
+    static std::string printCpuStats(const std::vector<std::string>& values1, const std::vector<std::string>& values2);
     static bool isPidExisting(const string& pid);
 };
 

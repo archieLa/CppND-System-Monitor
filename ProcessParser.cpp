@@ -1,5 +1,25 @@
 #include "ProcessParser.h"
 
+// 2 static helper functions
+static float get_sys_active_cpu_time(const vector<string>& values)
+{
+    return (stof(values[S_USER]) + stof(values[S_NICE]) + stof(values[S_SYSTEM]) +
+            stof(values[S_IRQ]) + stof(values[S_SOFTIRQ]) + stof(values[S_STEAL]) +
+            stof(values[S_GUEST]) + stof(values[S_GUEST_NICE]));
+}
+
+static float get_sys_idle_cpu_time(const vector<string>& values)
+{
+    return (stof(values[S_IDLE]) + stof(values[S_IOWAIT]));
+}
+
+static vector<string> seperate_strings_by_space(const string& in_string_to_seperate)
+{
+    istringstream buff(in_string_to_seperate);
+    return vector<string>(istream_iterator<string>(buff), istream_iterator<string>());
+}
+
+
 string ProcessParser::getCmd(const string& pid)
 {
     std::ifstream stream;
@@ -67,9 +87,34 @@ string ProcessParser::getVmSize(const string& pid)
 
 }
 
-string ProcessParser::getCpuPercent(string pid)
+string ProcessParser::getCpuPercent(const string& pid)
 {
-    //TODO
+    ifstream in_file;
+    Util::getStream((Path::basePath() + pid + "/" + Path::statPath()), in_file);
+
+    string in_line;
+    getline(in_file, in_line);
+
+    vector<string> stats = seperate_strings_by_space(in_line);
+
+    const uint8_t kStime = 14;
+    const uint8_t kCutime = 15;
+    const uint8_t kCstime = 16;
+    const uint8_t kStartTime = 21;
+
+    // Retrieve stats based on position and calculate values
+    float utime  = stof(getProcUpTime(pid));
+    float stime = stof(stats[kStime]);
+    float cutime = stof(stats[kCutime]);
+    float cstime = stof(stats[kCstime]);
+    float start_time = stof(stats[kStartTime]);
+    float uptime = getSysUpTime();
+    float freq = sysconf(_SC_CLK_TCK);
+    float total_time = utime + stime + cutime + cstime;
+    float seconds_process_running = uptime - (start_time/freq);
+    float cpu_percent = 100 * ((total_time/freq) / seconds_process_running);
+    return to_string(cpu_percent);
+
 }
 
 long int ProcessParser::getSysUpTime()
@@ -86,16 +131,14 @@ long int ProcessParser::getSysUpTime()
 
 string ProcessParser::getProcUpTime(const string& pid)
 {
-    ifstream proc_up_time_stream;
-    Util::getStream((Path::basePath() + pid + "/" + Path::statPath()), proc_up_time_stream);
+    ifstream in_file;
+    Util::getStream((Path::basePath() + pid + "/" + Path::statPath()), in_file);
     
-    string line_from_file;    
-    getline(proc_up_time_stream, line_from_file);
-    
-    istringstream helper_iss(line_from_file);
-    istream_iterator<string> beg(helper_iss), end; 
-    vector<string> proc_stats(beg, end);
-    
+    string in_line;    
+    getline(in_file, in_line);
+        
+    vector<string> proc_stats = seperate_strings_by_space(in_line);
+   
     const uint8_t kUpTimePos = 13;
     return to_string((stof(proc_stats[kUpTimePos])) / sysconf(_SC_CLK_TCK));
       
@@ -160,7 +203,59 @@ vector<string> ProcessParser::getSysCpuPercent(const string& coreNumber)
 
 float ProcessParser::getSysRamPercent()
 {
-    //TODO
+    const string kMemAvailable = "MemAvailable";
+    const string kMemFree = "MemFree";
+    const string kBuffers = "Buffers";
+    
+    const uint8_t kValuePos = 1;
+
+    float mem_available = 0;
+    float mem_free = 0;
+    float buffers = 0;
+    float sys_ram_percent = 0;
+
+    const uint8_t kMemStatsToFind = 3;
+    vector<bool> found_mem_stats;
+
+    ifstream in_file;
+    Util::getStream((Path::basePath() + Path::memInfoPath()), in_file);
+
+    string in_line;
+    while (getline(in_file, in_line))
+    {
+        vector<string> values;
+        
+        if (in_line.compare(0, kMemAvailable.size(), kMemAvailable) == 0)
+        {
+            values = seperate_strings_by_space(in_line);
+            mem_available = stof(values[kValuePos]);
+            found_mem_stats.push_back(true);
+        }
+
+        if (in_line.compare(0, kMemFree.size(), kMemFree) == 0)
+        {
+            values = seperate_strings_by_space(in_line);
+            mem_free = stof(values[kValuePos]);
+            found_mem_stats.push_back(true);
+        }
+
+        if (in_line.compare(0, kBuffers.size(), kBuffers) == 0)
+        {
+            values = seperate_strings_by_space(in_line);
+            buffers = stof(values[kValuePos]);
+            found_mem_stats.push_back(true);
+        }
+
+        // No need to check all the lines of the file if req mem stats are found
+        if (found_mem_stats.size() == kMemStatsToFind)
+        {
+            sys_ram_percent =  (100 * (1 - (mem_free / (mem_available - buffers))));               
+            break;
+        }
+    }
+
+    return sys_ram_percent;
+
 }
 
 string ProcessParser::getSysKernelVersion()
@@ -281,9 +376,13 @@ string ProcessParser::getOSName()
     return "";
 }
 
-std::string ProcessParser::PrintCpuStats(std::vector<std::string> values1, std::vector<std::string>values2)
+std::string ProcessParser::printCpuStats(const std::vector<std::string>& values1, const std::vector<std::string>& values2)
 {
-    //TODO
+    float active_time = get_sys_active_cpu_time(values2) - get_sys_active_cpu_time(values1);
+    float idle_time = get_sys_idle_cpu_time(values2) - get_sys_idle_cpu_time(values1);
+    float total_time = active_time + idle_time;
+    float cpu_active_percent = 100 * (active_time / total_time);
+    return to_string(cpu_active_percent);
 }
 
 bool ProcessParser::isPidExisting(const string& pid)
