@@ -1,4 +1,5 @@
 #include <string>
+#include "ProcessParser.h"
 
 using namespace std;
 /*
@@ -13,7 +14,7 @@ class Process
         string cmd_;
         string cpu_;
         string mem_;
-        string upTime_;
+        string up_time_;
 
     public:
         Process(const string& pid)
@@ -23,30 +24,65 @@ class Process
             cmd_ = ProcessParser::getCmd(pid);
             cpu_ = ProcessParser::getCpuPercent(pid);
             mem_ = ProcessParser::getVmSize(pid);
-            upTime_ = ProcessParser::getProcUpTime(pid);
+            up_time_ = ProcessParser::getProcUpTime(pid);
         }
     
+    void setPid(int pid)
+    {
+        pid_ = to_string(pid);    
+    }
 
-    string getPid() const;
-    string getUser() const;
-    string getCmd() const;
+    string getPid() const
+    {
+        return pid_;
+    }
+
+    string getUser() const
+    {
+        return user_;
+    }
     
-    int getCpu() const;
-    int getMem() const;
-    string getUpTime() const;
-    string getProcess() ;
+    string getCmd() const
+    {
+        return cmd_;
+    }
+    
+    float getCpu() const
+    {
+        return stof(cpu_);
+    }
+    
+    float getMem() const
+    {
+        return stof(mem_);
+    }
+
+    string getUpTime() const
+    {
+        return up_time_;
+    }
+
+    string getProcess()
+    {
+        if(!ProcessParser::isPidExisting(pid_))
+        {
+            return "";
+        }
+
+        mem_ = ProcessParser::getVmSize(pid_);
+        up_time_ = ProcessParser::getProcUpTime(pid_);
+        cpu_ = ProcessParser::getCpuPercent(pid_);
+    
+        return (pid_ + " "
+                + user_ + " "
+                + mem_.substr(0, 5) + " "
+                + cpu_.substr(0, 5) + " "
+                + up_time_.substr(0, 5) + " "
+                + cmd_.substr(0, 30) + "...");
+    }
+
 };
 
-
-string Process::getPid() const 
-{
-    return this->pid;
-}
-
-string Process::getUser() const
-{
-    return user_;
-}
 
 
 string Process::getProcess(){

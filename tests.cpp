@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include "Process.h"
 
 int main(int argc, char *argv[] )
 {
