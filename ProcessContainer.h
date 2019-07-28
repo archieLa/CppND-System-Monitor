@@ -1,3 +1,6 @@
+#ifndef PROCESS_CONTAINER_H_
+#define PROCESS_CONTAINER_H
+
 #include "Process.h"
 #include <vector>
 
@@ -6,6 +9,7 @@ class ProcessContainer
 
 private:
     std::vector<Process> list_;
+
 public:
     ProcessContainer()
     {
@@ -61,8 +65,10 @@ std::vector<std::vector<std::string> > ProcessContainer::getList()
             std::vector<std::string> sub(&stringifiedList[lastIndex], &stringifiedList[i+1]);
             values.push_back(sub);
         }
-   }
+    }
     
     return values;
 
 }
+
+#endif

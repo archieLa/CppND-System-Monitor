@@ -1,3 +1,6 @@
+#ifndef SYS_INFO_H_
+#define SYS_INFO_H_
+
 #include <string>
 #include <iostream>
 #include <vector>
@@ -37,18 +40,19 @@ public:
 
     void setAttributes();
     void setLastCpuMeasures();
-    std::string getMemPercent()const;
-    long getUpTime()const;
-    std::string getThreads()const;
-    std::string getTotalProc()const;
-    std::string getRunningProc()const;
-    std::string getKernelVersion()const;
-    std::string getOSName()const;
-    std::string getCpuPercent()const;
+    std::string getMemPercent() const;
+    long getUpTime() const;
+    std::string getThreads() const;
+    std::string getTotalProc() const;
+    std::string getRunningProc() const;
+    std::string getKernelVersion() const;
+    std::string getOSName() const;
+    std::string getCpuPercent() const;
     void getOtherCores(int _size);
     void setCpuCoresStats();
-    std::vector<std::string> getCoresStats()const;
+    std::vector<std::string> getCoresStats() const;
 };
+
 
 void SysInfo::getOtherCores(int _size)
 {
@@ -161,3 +165,5 @@ std::string SysInfo::getOSName() const
 {
     return os_name_;
 }
+
+#endif
